@@ -35,6 +35,7 @@
         <attr name="cs_end_angle" format="float"/>
         <attr name="cs_disable_progress_glow" format="boolean"/>
         <attr name="cs_hide_progress_when_empty" format="boolean"/>
+        <attr name="cs_hide_progress" format="boolean"/>
     </declare-styleable>
 
 </resources>
