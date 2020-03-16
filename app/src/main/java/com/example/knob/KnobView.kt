@@ -131,6 +131,16 @@ class KnobView : View {
     private var mCircleYRadius: Float = 0.toFloat()
 
     /**
+     * Showing or hiding the markers
+     */
+    private var mShowMarkers: Boolean = DEFAULT_SHOW_MARKERS
+
+    /**
+     * Showing the pointer with some padding inside the circle as opposed to on the circle
+     */
+    private var mPointerInside: Boolean = DEFAULT_POINTER_INSIDE
+
+    /**
      * If disable pointer, we can't seek the progress.
      */
     private var mDisablePointer: Boolean = false
@@ -614,6 +624,12 @@ class KnobView : View {
      * @param attrArray TypedArray containing the attributes.
      */
     private fun initAttributes(attrArray: TypedArray) {
+        mKnobColor =
+            attrArray.getColor(R.styleable.cs_CircularSeekBar_cs_knob_fill, DEFAULT_KNOB_COLOR)
+        mShowMarkers =
+            attrArray.getBoolean(R.styleable.cs_CircularSeekBar_cs_markers_enabled, DEFAULT_SHOW_MARKERS)
+        mPointerInside =
+            attrArray.getBoolean(R.styleable.cs_CircularSeekBar_cs_pointer_inside, DEFAULT_SHOW_MARKERS)
         mCircleXRadius =
             attrArray.getDimension(R.styleable.cs_CircularSeekBar_cs_circle_x_radius, DEFAULT_CIRCLE_X_RADIUS)
         mCircleYRadius =
@@ -871,17 +887,18 @@ class KnobView : View {
             mCircleProgressPath!!.addArc(pathCircle, extendStart, extendDegrees)
 
             val pointerStart = mPointerPosition - mPointerAngle / 2.0f
-            with(pathCircle)
-            {
-                left += mPointerStrokeWidth
-                right -= mPointerStrokeWidth
-                top += mPointerStrokeWidth
-                bottom -= mPointerStrokeWidth
+            if (mPointerInside) {
+                with(pathCircle)
+                {
+                    left += mPointerStrokeWidth
+                    right -= mPointerStrokeWidth
+                    top += mPointerStrokeWidth
+                    bottom -= mPointerStrokeWidth
+                }
             }
             mCirclePointerPath!!.reset()
             mCirclePointerPath!!.addArc(pathCircle, pointerStart, mPointerAngle)
         }
-
     }
 
     /**
@@ -899,7 +916,7 @@ class KnobView : View {
         canvas.drawPath(mCirclePath!!, mCircleFillPaint!!)
         canvas.drawPath(mCirclePath!!, mCirclePaint!!)
 
-        /* val ableToGoNegative = isNegativeEnabled && abs(mTotalCircleDegrees - 360f) < SMALL_DEGREE_BIAS * 2
+        val ableToGoNegative = isNegativeEnabled && abs(mTotalCircleDegrees - 360f) < SMALL_DEGREE_BIAS * 2
          // Hide progress bar when progress is 0
          // Also make sure we still draw progress when has pointer or able to go negative
          val shouldHideProgress = mHideProgressWhenEmpty && mProgressDegrees == 0f &&
@@ -911,7 +928,7 @@ class KnobView : View {
              }
 
              canvas.drawPath(mCircleProgressPath!!, mCircleProgressPaint!!)
-         }*/
+         }
 
 
         //draw the knob(main circle)
@@ -924,25 +941,25 @@ class KnobView : View {
             canvas.drawPath(mCirclePointerPath!!, mPointerPaint!!)
         }
 
-        markerPositions.forEachIndexed { index, pair ->
-            if (index == selectedmarkerIndex) {
-                canvas.drawCircle(
-                    pair.first,
-                    pair.second,
-                    MARKER_CIRCLE_RADIUS,
-                    mSelectedMarkerCircle!!
-                )
-            } else {
-                canvas.drawCircle(
-                    pair.first,
-                    pair.second,
-                    MARKER_CIRCLE_RADIUS,
-                    mMarkerCircle!!
-                )
+        if (mShowMarkers) {
+            markerPositions.forEachIndexed { index, pair ->
+                if (index == selectedmarkerIndex) {
+                    canvas.drawCircle(
+                        pair.first,
+                        pair.second,
+                        MARKER_CIRCLE_RADIUS,
+                        mSelectedMarkerCircle!!
+                    )
+                } else {
+                    canvas.drawCircle(
+                        pair.first,
+                        pair.second,
+                        MARKER_CIRCLE_RADIUS,
+                        mMarkerCircle!!
+                    )
+                }
             }
         }
-
-
     }
 
     var selectedmarkerIndex = 0
@@ -1413,6 +1430,8 @@ class KnobView : View {
         private val DEFAULT_NEGATIVE_ENABLED = false
         private val DEFAULT_DISABLE_PROGRESS_GLOW = false
         private val DEFAULT_CS_HIDE_PROGRESS_WHEN_EMPTY = false
+        private val DEFAULT_SHOW_MARKERS = true
+        private val DEFAULT_POINTER_INSIDE = false
     }
 
 }
